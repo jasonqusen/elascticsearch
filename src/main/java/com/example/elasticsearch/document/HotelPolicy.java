@@ -1,64 +1,19 @@
 package com.example.elasticsearch.document;
 
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import lombok.Data;
+
+@Data
 public class HotelPolicy {
-
+	@Field(type = FieldType.Keyword)
 	private String policyName;
-
+	@Field(type = FieldType.Text)
 	private String policyValue;
-
+	@Field(type = FieldType.Keyword)
 	private String policyNameEn;
-
+	@Field(type = FieldType.Text)
 	private String policyValueEn;
 
-	public String getPolicyName() {
-		return policyName;
-	}
-
-	public void setPolicyName(String policyName) {
-		if (policyName == null) {
-			this.policyName = "";
-		} else {
-			this.policyName = policyName;
-		}
-
-	}
-
-	public String getPolicyValue() {
-		return policyValue;
-	}
-
-	public void setPolicyValue(String policyValue) {
-		if (policyValue == null) {
-			this.policyValue = "";
-		} else {
-			this.policyValue = policyValue;
-		}
-
-	}
-
-	public String getPolicyNameEn() {
-		return policyNameEn;
-	}
-
-	public void setPolicyNameEn(String policyNameEn) {
-		if (policyNameEn == null) {
-			this.policyNameEn = "";
-		} else {
-			this.policyNameEn = policyNameEn;
-		}
-
-	}
-
-	public String getPolicyValueEn() {
-		return policyValueEn;
-	}
-
-	public void setPolicyValueEn(String policyValueEn) {
-		if (policyValueEn == null) {
-			this.policyValueEn = "";
-		} else {
-			this.policyValueEn = policyValueEn;
-		}
-
-	}
 }

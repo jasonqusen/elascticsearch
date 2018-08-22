@@ -1,66 +1,19 @@
 package com.example.elasticsearch.document;
 
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
+
+import lombok.Data;
+
+@Data
 public class HotelFacility {
-
+	@Field(type = FieldType.Keyword)
 	private String facilityName;
-
+	@Field(type = FieldType.Text)
 	private String facilityValue;
-
+	@Field(type = FieldType.Keyword)
 	private String facilityNameEn;
-
+	@Field(type = FieldType.Text)
 	private String facilityValueEn;
 
-	public String getFacilityName() {
-		return facilityName;
-	}
-
-	public void setFacilityName(String facilityName) {
-		if (facilityName == null) {
-			this.facilityName = "";
-		} else {
-			this.facilityName = facilityName;
-		}
-
-	}
-
-	public String getFacilityValue() {
-		return facilityValue;
-	}
-
-	public void setFacilityValue(String facilityValue) {
-
-		if (facilityValue == null) {
-			this.facilityValue = "";
-		} else {
-			this.facilityValue = facilityValue;
-		}
-
-	}
-
-	public String getFacilityNameEn() {
-		return facilityNameEn;
-	}
-
-	public void setFacilityNameEn(String facilityNameEn) {
-
-		if (facilityNameEn == null) {
-			this.facilityNameEn = "";
-		} else {
-			this.facilityNameEn = facilityNameEn;
-		}
-
-	}
-
-	public String getFacilityValueEn() {
-		return facilityValueEn;
-	}
-
-	public void setFacilityValueEn(String facilityValueEn) {
-		if (facilityValueEn == null) {
-			this.facilityValueEn = "";
-		} else {
-			this.facilityValueEn = facilityValueEn;
-		}
-
-	}
 }

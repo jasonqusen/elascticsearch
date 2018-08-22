@@ -125,8 +125,8 @@ public class HotelService {
 					Hotel hotel = new Hotel();
 					String highLightMessage = searchHit.getHighlightFields().get("hotel_name").fragments()[0]
 							.toString();
-					hotel.setHotel_id(searchHit.getId());
-					hotel.setHotel_name(highLightMessage);
+					hotel.setHotelId(searchHit.getId());
+					hotel.setHotelName(highLightMessage);
 					hotels.add(hotel);
 				}
 				if (hotels.size() > 0) {
