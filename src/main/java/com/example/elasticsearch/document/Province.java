@@ -12,11 +12,11 @@ import lombok.Data;
 public class Province {
 	@Id
 	@Field(type = FieldType.Integer)
-	private String provinceCode;
+	private Integer provinceCode;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String provinceName;
 	@Field(type = FieldType.Integer)
-	private String countryCode;
+	private Integer countryCode;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String countryName;
 
