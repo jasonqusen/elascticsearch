@@ -10,7 +10,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import lombok.Data;
 
 @Data
-@Document(indexName = "roomtype", type = "roomtype")
+@Document(indexName = "room_type", type = "room_type")
 public class RoomType {
 
 	@Field(type = FieldType.Keyword)
@@ -20,7 +20,7 @@ public class RoomType {
 	private String roomTypeAdapterId;
 	@Field(type = FieldType.Integer)
 	private Integer city;
-	@Field(type = FieldType.Keyword)
+	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String roomName;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String feature;

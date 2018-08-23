@@ -7,6 +7,7 @@ import org.springframework.data.elasticsearch.annotations.DateFormat;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.GeoPointField;
 
 import lombok.Data;
 
@@ -68,7 +69,7 @@ public class Hotel {
 	private String linkmanOther;
 	@Field(type = FieldType.Integer)
 	private Integer priority;
-	@Field(type = FieldType.Text)
+	@GeoPointField
 	private String location;
 	@Field(type = FieldType.Double)
 	private Double longitude;
