@@ -1,8 +1,8 @@
-package com.example.elasticsearch.dao;
+package com.rails.elasticsearch.dao;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-import com.example.elasticsearch.document.Price;
+import com.rails.elasticsearch.document.Price;
 
 public interface PriceDao extends ElasticsearchRepository<Price, String> {
 

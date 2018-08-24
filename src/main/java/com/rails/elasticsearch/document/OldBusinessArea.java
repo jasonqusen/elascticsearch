@@ -1,4 +1,4 @@
-package com.example.elasticsearch.document;
+package com.rails.elasticsearch.document;
 
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
@@ -6,10 +6,10 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import lombok.Data;
 
 @Data
-public class BusinessArea {
+public class OldBusinessArea {
 	@Field(type = FieldType.Text)
-	private String businessAreaCode;
+	private String oldBusinessAreaCode;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
-	private String businessAreaName;
+	private String oldBusinessAreaName;
 
 }

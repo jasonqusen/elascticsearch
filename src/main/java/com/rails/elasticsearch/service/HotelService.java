@@ -1,4 +1,4 @@
-package com.example.elasticsearch.service;
+package com.rails.elasticsearch.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,24 +26,24 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.stereotype.Service;
 
-import com.example.elasticsearch.dao.HotelDao;
-import com.example.elasticsearch.document.Hotel;
+import com.rails.elasticsearch.dao.HotelDao;
+import com.rails.elasticsearch.document.Hotel;
 
 @Service
 public class HotelService {
 
 	@Autowired
-	HotelDao hotelDao;
+	private HotelDao hotelDao;
 
 	@Autowired
-	ElasticsearchTemplate elasticsearchTemplate;
+	private ElasticsearchTemplate elasticsearchTemplate;
 
 	/**
 	 * term 查询
 	 */
 	public Iterable<Hotel> termQuery() {
 
-		TermQueryBuilder builder = new TermQueryBuilder("business_area_name", "北京");
+		TermQueryBuilder builder = new TermQueryBuilder("businessAreaName", "北京");
 
 		Iterable<Hotel> hotels = hotelDao.search(builder);
 
@@ -54,7 +54,7 @@ public class HotelService {
 	 * terms 查询
 	 */
 	public Iterable<Hotel> termsQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("business_area_name", "北京", "南京", "天津");
+		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "北京", "南京", "天津");
 
 		Iterable<Hotel> hotels = hotelDao.search(builder);
 
@@ -65,7 +65,7 @@ public class HotelService {
 	 * 分页查询
 	 */
 	public Iterable<Hotel> pageQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("business_area_name", "北京");
+		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "北京");
 		int pageNum = 1;
 		int pageSize = 15;
 		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
@@ -73,12 +73,13 @@ public class HotelService {
 	}
 
 	/**
-	 * 分页及排序
+	 * 
+
 	 */
 	public Iterable<Hotel> pageAndSortQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("business_area_name", "北京");
+		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "北京");
 
-		String orderBy = "create_time";
+		String orderBy = "createTime";
 		Sort sort = new Sort(Direction.DESC, orderBy);
 
 		int pageNum = 1; // 作用是什么？？
@@ -92,7 +93,7 @@ public class HotelService {
 	 * match 查询
 	 */
 	public Iterable<Hotel> matchQuery() {
-		MatchQueryBuilder builder = new MatchQueryBuilder("business_area_name", "上海");
+		MatchQueryBuilder builder = new MatchQueryBuilder("businessAreaName", "上海");
 		return hotelDao.search(builder);
 	}
 
@@ -106,8 +107,8 @@ public class HotelService {
 		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
 
 		NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-				.withQuery(QueryBuilders.termQuery("hotel_name", "北京"))
-				.withHighlightFields(new HighlightBuilder.Field("hotel_name")).withPageable(pageable).build();
+				.withQuery(QueryBuilders.termQuery("hotelName", "北京"))
+				.withHighlightFields(new HighlightBuilder.Field("hotelName")).withPageable(pageable).build();
 
 		Page<Hotel> page = elasticsearchTemplate.queryForPage(searchQuery, Hotel.class, new SearchResultMapper() {
 
@@ -123,8 +124,7 @@ public class HotelService {
 						return null;
 					}
 					Hotel hotel = new Hotel();
-					String highLightMessage = searchHit.getHighlightFields().get("hotel_name").fragments()[0]
-							.toString();
+					String highLightMessage = searchHit.getHighlightFields().get("hotelName").fragments()[0].toString();
 					hotel.setHotelId(searchHit.getId());
 					hotel.setHotelName(highLightMessage);
 					hotels.add(hotel);
@@ -145,24 +145,7 @@ public class HotelService {
 		int pageNum = 1;
 		int pageSize = 15;
 		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-		MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("北京", "hotel_name", "business_area_name");
+		MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("北京", "hotelName", "businessAreaName");
 		return hotelDao.search(queryBuilder, pageable);
 	}
-
-	/**
-	 * 拼接在某属性的 set方法
-	 * 
-	 * @param fieldName
-	 * @return String
-	 */
-	// private static String parSetName(String fieldName) {
-	// if (null == fieldName || "".equals(fieldName)) {
-	// return null;
-	// }
-	// int startIndex = 0;
-	// if (fieldName.charAt(0) == '_')
-	// startIndex = 1;
-	// return "set" + fieldName.substring(startIndex, startIndex + 1).toUpperCase()
-	// + fieldName.substring(startIndex + 1);
-	// }
 }

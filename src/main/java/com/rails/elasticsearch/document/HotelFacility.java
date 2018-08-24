@@ -1,4 +1,4 @@
-package com.example.elasticsearch.document;
+package com.rails.elasticsearch.document;
 
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;

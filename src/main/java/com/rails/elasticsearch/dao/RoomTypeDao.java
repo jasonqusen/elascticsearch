@@ -1,8 +1,8 @@
-package com.example.elasticsearch.dao;
+package com.rails.elasticsearch.dao;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
-import com.example.elasticsearch.document.RoomType;
+import com.rails.elasticsearch.document.RoomType;
 
 public interface RoomTypeDao extends ElasticsearchRepository<RoomType, String> {
 

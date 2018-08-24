@@ -1,4 +1,4 @@
-package com.example.elasticsearch.service;
+package com.rails.elasticsearch.mapping;
 
 import java.io.IOException;
 import java.net.InetAddress;

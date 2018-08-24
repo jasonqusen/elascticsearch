@@ -1,4 +1,4 @@
-package com.example.elasticsearch.document;
+package com.rails.elasticsearch.document;
 
 import java.util.List;
 
