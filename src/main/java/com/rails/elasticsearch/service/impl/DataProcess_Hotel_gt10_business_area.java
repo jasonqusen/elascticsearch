@@ -19,7 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.rails.elasticsearch.common.MessageRequest;
 import com.rails.elasticsearch.service.MQ2Elasticsearch;
 
-@Service("DataProcess_Hotel_gt10_business_area")
+@Service("dataProcess_Hotel_gt10_business_area")
 public class DataProcess_Hotel_gt10_business_area implements MQ2Elasticsearch {
 
 	private Logger logger = LoggerFactory.getLogger(DataProcess_Hotel_gt10_business_area.class);

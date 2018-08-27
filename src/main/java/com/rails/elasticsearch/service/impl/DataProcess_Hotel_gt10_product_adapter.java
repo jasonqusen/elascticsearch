@@ -20,7 +20,7 @@ import com.rails.elasticsearch.common.DateUtils;
 import com.rails.elasticsearch.common.MessageRequest;
 import com.rails.elasticsearch.service.MQ2Elasticsearch;
 
-@Service("DataProcess_Hotel_gt10_product_adapter")
+@Service("dataProcess_Hotel_gt10_product_adapter")
 public class DataProcess_Hotel_gt10_product_adapter implements MQ2Elasticsearch {
 	private Logger logger = LoggerFactory.getLogger(DataProcess_Hotel_gt10_product_adapter.class);
 	@Autowired

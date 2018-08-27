@@ -22,7 +22,7 @@ import com.rails.elasticsearch.common.DateUtils;
 import com.rails.elasticsearch.common.MessageRequest;
 import com.rails.elasticsearch.service.MQ2Elasticsearch;
 
-@Service("DataProcess_Hotel_gt10_hotel_adapter")
+@Service("dataProcess_Hotel_gt10_hotel_adapter")
 public class DataProcess_Hotel_gt10_hotel_adapter implements MQ2Elasticsearch {
 
 	private Logger logger = LoggerFactory.getLogger(DataProcess_Hotel_gt10_hotel_adapter.class);
@@ -58,6 +58,13 @@ public class DataProcess_Hotel_gt10_hotel_adapter implements MQ2Elasticsearch {
 			oldBusinessArea.put("oldBusinessAreaName", parseObject.get("oldBusinessAreaName"));
 			parseObject.put("oldBusinessArea", oldBusinessArea);
 			parseObject.remove("oldBusinessAreaName");
+
+			Map<String, Object> location = new HashMap<>();
+			location.put("lat", parseObject.get("latitude"));
+			location.put("lon", parseObject.get("longitude"));
+			parseObject.put("location", location);
+			parseObject.remove("latitude");
+			parseObject.remove("longitude");
 
 			IndexResponse response = client.prepareIndex("hotel", "hotel", parseObject.getString("hotelId"))
 					.setSource(parseObject.toJSONString(), XContentType.JSON).get();
