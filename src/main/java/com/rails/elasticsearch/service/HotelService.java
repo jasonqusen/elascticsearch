@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
@@ -24,9 +24,11 @@ import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
 import com.rails.elasticsearch.dao.HotelDao;
+import com.rails.elasticsearch.document.BusinessArea;
 import com.rails.elasticsearch.document.Hotel;
 
 @Service
@@ -39,11 +41,21 @@ public class HotelService {
 	private ElasticsearchTemplate elasticsearchTemplate;
 
 	/**
+	 * 根据城市名称查找
+	 */
+	public List<Hotel> findByCityName(String cityName) {
+
+		List<Hotel> list = hotelDao.findByCityName(cityName);
+
+		return list;
+	}
+
+	/**
 	 * term 查询
 	 */
 	public Iterable<Hotel> termQuery() {
 
-		TermQueryBuilder builder = new TermQueryBuilder("businessAreaName", "北京");
+		TermQueryBuilder builder = new TermQueryBuilder("businessAreaName", "国贸地区");
 
 		Iterable<Hotel> hotels = hotelDao.search(builder);
 
@@ -65,7 +77,7 @@ public class HotelService {
 	 * 分页查询
 	 */
 	public Iterable<Hotel> pageQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "北京");
+		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "国贸地区");
 		int pageNum = 1;
 		int pageSize = 15;
 		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
@@ -74,10 +86,10 @@ public class HotelService {
 
 	/**
 	 * 
-
+	
 	 */
-	public Iterable<Hotel> pageAndSortQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "北京");
+	public Page<Hotel> pageAndSortQuery() {
+		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "国贸地区");
 
 		String orderBy = "createTime";
 		Sort sort = new Sort(Direction.DESC, orderBy);
@@ -92,9 +104,16 @@ public class HotelService {
 	/**
 	 * match 查询
 	 */
-	public Iterable<Hotel> matchQuery() {
-		MatchQueryBuilder builder = new MatchQueryBuilder("businessAreaName", "上海");
-		return hotelDao.search(builder);
+	public List<Hotel> matchQuery(String businessAreaCode, String businessAreaName) {
+		BusinessArea businessArea = new BusinessArea();
+		businessArea.setBusinessAreaCode(businessAreaCode);
+		businessArea.setBusinessAreaName(businessAreaName);
+		Pageable page = PageRequest.of(0, 10);
+		BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+		queryBuilder.must(QueryBuilders.matchQuery("businessArea", businessArea));
+		SearchQuery query = new NativeSearchQueryBuilder().withQuery(queryBuilder).withPageable(page).build();
+		Page<Hotel> pages = hotelDao.search(query);
+		return pages.getContent();
 	}
 
 	/**
@@ -145,7 +164,7 @@ public class HotelService {
 		int pageNum = 1;
 		int pageSize = 15;
 		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-		MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("北京", "hotelName", "businessAreaName");
+		MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery("国贸地区", "hotelName", "businessAreaName");
 		return hotelDao.search(queryBuilder, pageable);
 	}
 }

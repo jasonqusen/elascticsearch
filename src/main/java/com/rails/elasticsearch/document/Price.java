@@ -78,9 +78,9 @@ public class Price {
 	private String guaranteeCode;
 	@Field(type = FieldType.Text)
 	private String holdTime;
-	@Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+	@Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
 	private String starCancel;
-	@Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+	@Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss")
 	private String endCancel;
 	@Field(type = FieldType.Double)
 	private Double forfeit;
