@@ -24,7 +24,7 @@ public class Hotel {
 	@Field(type = FieldType.Text)
 	private String hotelNameEn;
 	@Field(type = FieldType.Float)
-	private float hotelPrice;
+	private float basePrice;
 	@Field(type = FieldType.Text)
 	private String hotelGroup;
 	@Field(type = FieldType.Keyword)
@@ -107,28 +107,14 @@ public class Hotel {
 	private String oldCountyCode;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String oldCountyName;
-	@Field(type = FieldType.Text)
-	private String landmark;
-	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
-	private String landmarkName;
-	@Field(type = FieldType.Text)
-	private String oldLandmark;
-	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
-	private String oldLandmarkName;
+	@Field(type = FieldType.Nested)
+	private List<Landmark> landmark;
+	@Field(type = FieldType.Nested)
+	private List<OldLandmark> oldLandmark;
 	@Field(type = FieldType.Nested)
 	private List<BusinessArea> businessArea;
 	@Field(type = FieldType.Nested)
 	private List<OldBusinessArea> oldBusinessArea;
-	// @Field(type = FieldType.Text)
-	// private String businessArea;
-	// @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer =
-	// "ik_max_word")
-	// private String businessAreaName;
-	// @Field(type = FieldType.Text)
-	// private String oldBusinessArea;
-	// @Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer =
-	// "ik_max_word")
-	// private String oldBusinessAreaName;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String announcement;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")

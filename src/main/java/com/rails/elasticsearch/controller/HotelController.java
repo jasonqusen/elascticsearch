@@ -1,9 +1,9 @@
 package com.rails.elasticsearch.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,36 +22,27 @@ public class HotelController {
 	private HotelService hotelService;
 
 	/**
-	 * 分页及排序
+	 * 根据索引和类型获取mapping
 	 * 
+	 * @param indexName
+	 * @param type
 	 * @return
 	 */
-	@GetMapping("/hotel/page/sort")
-	@ApiOperation(value = "分页及排序", notes = "分页及排序")
-	public Page<Hotel> pageAndSortQuery() {
-		return hotelService.pageAndSortQuery();
+	@GetMapping("/hotel/get/mapping")
+	@ApiOperation(value = "根据索引和类型获取mapping", notes = "根据索引和类型获取mapping")
+	public Map<?, ?> getMapping(@RequestParam String indexName, @RequestParam String type) {
+		return hotelService.getMapping(indexName, type);
 	}
 
 	/**
-	 * term查询
+	 * 根据城市名称term查询
 	 * 
 	 * @return
 	 */
-	@GetMapping("/hotel/term")
-	@ApiOperation(value = "term查询", notes = "term查询")
-	public Iterable<Hotel> termQuery() {
-		return hotelService.termQuery();
-	}
-
-	/**
-	 * 根据商业区名称查找
-	 * 
-	 * @return
-	 */
-	@GetMapping("/hotel/cityName")
-	@ApiOperation(value = "根据城市名称查找", notes = "根据城市名称查找")
-	public List<Hotel> findByCityName(@RequestParam String cityName) {
-		return hotelService.findByCityName(cityName);
+	@GetMapping("/hotel/cityName/term")
+	@ApiOperation(value = "根据城市名称term查询", notes = "根据城市名称term查询")
+	public Iterable<Hotel> termQueryByCityName(@RequestParam String cityName) {
+		return hotelService.termQueryByCityName(cityName);
 	}
 
 	/**

@@ -1,28 +1,18 @@
 package com.rails.elasticsearch.service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.core.SearchResultMapper;
-import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
-import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
@@ -41,23 +31,26 @@ public class HotelService {
 	private ElasticsearchTemplate elasticsearchTemplate;
 
 	/**
-	 * 根据城市名称查找
+	 * 根据索引和类型获取mapping
+	 * 
+	 * @param indexName
+	 * @param type
+	 * @return
 	 */
-	public List<Hotel> findByCityName(String cityName) {
+	public Map<?, ?> getMapping(String indexName, String type) {
+		Map<?, ?> mapping = elasticsearchTemplate.getMapping(indexName, type);
 
-		List<Hotel> list = hotelDao.findByCityName(cityName);
-
-		return list;
+		return mapping;
 	}
 
 	/**
 	 * term 查询
 	 */
-	public Iterable<Hotel> termQuery() {
+	public Iterable<Hotel> termQueryByCityName(String cityName) {
+		TermQueryBuilder termQuery = QueryBuilders.termQuery("cityName", cityName);
 
-		TermQueryBuilder builder = new TermQueryBuilder("businessAreaName", "国贸地区");
-
-		Iterable<Hotel> hotels = hotelDao.search(builder);
+//		TermQueryBuilder builder = new TermQueryBuilder("cityName", cityName);
+		Iterable<Hotel> hotels = hotelDao.search(termQuery);
 
 		return hotels;
 	}
@@ -74,34 +67,6 @@ public class HotelService {
 	}
 
 	/**
-	 * 分页查询
-	 */
-	public Iterable<Hotel> pageQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "国贸地区");
-		int pageNum = 1;
-		int pageSize = 15;
-		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-		return hotelDao.search(builder, pageable);
-	}
-
-	/**
-	 * 
-	
-	 */
-	public Page<Hotel> pageAndSortQuery() {
-		TermsQueryBuilder builder = new TermsQueryBuilder("businessAreaName", "国贸地区");
-
-		String orderBy = "createTime";
-		Sort sort = new Sort(Direction.DESC, orderBy);
-
-		int pageNum = 1; // 作用是什么？？
-		int pageSize = 15;
-		Pageable pageable = PageRequest.of(pageNum - 1, pageSize, sort);
-
-		return hotelDao.search(builder, pageable);
-	}
-
-	/**
 	 * match 查询
 	 */
 	public List<Hotel> matchQuery(String businessAreaCode, String businessAreaName) {
@@ -114,47 +79,6 @@ public class HotelService {
 		SearchQuery query = new NativeSearchQueryBuilder().withQuery(queryBuilder).withPageable(page).build();
 		Page<Hotel> pages = hotelDao.search(query);
 		return pages.getContent();
-	}
-
-	/**
-	 * 高亮显示
-	 */
-	public Iterable<Hotel> hightQuery() {
-
-		int pageNum = 1;
-		int pageSize = 15;
-		Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-
-		NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-				.withQuery(QueryBuilders.termQuery("hotelName", "北京"))
-				.withHighlightFields(new HighlightBuilder.Field("hotelName")).withPageable(pageable).build();
-
-		Page<Hotel> page = elasticsearchTemplate.queryForPage(searchQuery, Hotel.class, new SearchResultMapper() {
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-
-				List<Hotel> hotels = new ArrayList<>();
-				SearchHits hits = response.getHits();
-
-				for (SearchHit searchHit : hits) {
-					if (hits.getHits().length <= 0) {
-						return null;
-					}
-					Hotel hotel = new Hotel();
-					String highLightMessage = searchHit.getHighlightFields().get("hotelName").fragments()[0].toString();
-					hotel.setHotelId(searchHit.getId());
-					hotel.setHotelName(highLightMessage);
-					hotels.add(hotel);
-				}
-				if (hotels.size() > 0) {
-					return new AggregatedPageImpl<T>((List<T>) hotels);
-				}
-				return null;
-			}
-		});
-		return page;
 	}
 
 	/**

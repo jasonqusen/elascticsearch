@@ -66,6 +66,18 @@ public class DataProcess_Hotel_gt10_hotel_adapter implements MQ2Elasticsearch {
 			parseObject.remove("latitude");
 			parseObject.remove("longitude");
 
+			Map<String, Object> landmark = new HashMap<>();
+			landmark.put("landmarkCode", parseObject.get("landmark"));
+			landmark.put("landmarkName", parseObject.get("landmarkName"));
+			parseObject.put("landmark", landmark);
+			parseObject.remove("landmarkName");
+
+			Map<String, Object> oldLandmark = new HashMap<>();
+			oldLandmark.put("oldLandmarkCode", parseObject.get("oldLandmark"));
+			oldLandmark.put("oldLandmarkName", parseObject.get("oldLandmarkName"));
+			parseObject.put("oldLandmark", oldLandmark);
+			parseObject.remove("oldLandmarkName");
+
 			IndexResponse response = client.prepareIndex("hotel", "hotel", parseObject.getString("hotelId"))
 					.setSource(parseObject.toJSONString(), XContentType.JSON).get();
 			logger.info("DataProcess_Hotel_gt10_hotel_adapter========" + response.status());
