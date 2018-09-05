@@ -18,12 +18,16 @@ public class Hotel {
 	@Field(type = FieldType.Text)
 	private String hotelId;
 	@Field(type = FieldType.Text)
+	private String bizdate;
+	@Field(type = FieldType.Date, format = DateFormat.custom, pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+	private String updateTime;
+	@Field(type = FieldType.Text)
 	private String oldHotelId;
 	@Field(type = FieldType.Text, analyzer = "ik_max_word", searchAnalyzer = "ik_max_word")
 	private String hotelName;
 	@Field(type = FieldType.Text)
 	private String hotelNameEn;
-	@Field(type = FieldType.Float)
+	@Field(type = FieldType.Double)
 	private float basePrice;
 	@Field(type = FieldType.Text)
 	private String hotelGroup;

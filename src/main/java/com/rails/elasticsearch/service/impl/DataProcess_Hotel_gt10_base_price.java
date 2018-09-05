@@ -5,9 +5,14 @@
  */
 package com.rails.elasticsearch.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
@@ -16,34 +21,73 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.rails.elasticsearch.common.DateUtils;
 import com.rails.elasticsearch.common.MessageRequest;
 import com.rails.elasticsearch.service.MQ2Elasticsearch;
+import com.rails.elasticsearch.utils.JSONUtils;
 
 @Service("dataProcess_Hotel_gt10_base_price")
 public class DataProcess_Hotel_gt10_base_price implements MQ2Elasticsearch {
+
+	private static final int bulkNum = 2;
 	private Logger logger = LoggerFactory.getLogger(DataProcess_Hotel_gt10_base_price.class);
 	@Autowired
 	private TransportClient client;
 
 	@Override
 	public boolean mqData2Elasticsearch(List<MessageRequest> datas) {
-		datas.stream().forEach(e -> {
-			String body = e.getBody();
-			JSONObject parseObject = JSONObject.parseObject(body);
 
-			if (parseObject.get("createTime") != null) {
-				parseObject.put("createTime",
-						DateUtils.longToString((long) parseObject.get("createTime"), "yyyy-MM-dd HH:mm:ss.SSS"));
+		int count = 0;
+		int loopNum = 0;// 批量导入数据循环次数
+		logger.info("DataProcess_Hotel_gt10_base_price需要导入的数据总条数为：" + datas.size() + ",以" + bulkNum + "为一个批次进行导入。");
+		BulkRequestBuilder bulkRequest = client.prepareBulk();
+		BulkRequestBuilder requestBuilder = null;
+		for (int i = 0; i < datas.size(); i++) {
+			JSONObject parseObject = JSONObject.parseObject(datas.get(i).getBody());
+			if (parseObject != null) {
+				// 格式化时间类型
+				parseObject = JSONUtils.formatDate("yyyy-MM-dd HH:mm:ss.SSS", parseObject, "createTime");
+				parseObject = JSONUtils.formatDate("yyyy-MM-dd HH:mm:ss.SSS", parseObject, "updateTime");
+				// 和hotel构建es父子关系
+				Map<String, Object> join = new HashMap<>();
+				join.put("name", "basePrice");
+				join.put("parent", parseObject.getString("hotelId"));
+				parseObject.put("hotelJoin", join);
+				// 构建base_price子文档id
+				String basePriceId = parseObject.getString("hotelId") + "_" + parseObject.getString("city") + "_"
+						+ parseObject.getString("bizdate");
+				// 批量往ES导入数据
+				IndexRequestBuilder setSource = client.prepareIndex("hotel", "hotel", basePriceId)
+						.setRouting(parseObject.getString("hotelId"))
+						.setSource(parseObject.toJSONString(), XContentType.JSON);
+				requestBuilder = bulkRequest.add(setSource);
+				count++;
+
+				// 每100条数据进行批量导入
+				if (count % bulkNum == 0) {
+					loopNum++;
+					BulkResponse response = requestBuilder.get();
+					bulkRequest = client.prepareBulk();
+					if (response.hasFailures()) {
+						// 数据导入失败时，打印这个批次全部的数据
+						List<String> collect = datas.subList(bulkNum * (loopNum - 1), bulkNum * loopNum).stream()
+								.map(e -> e.getBody()).collect(Collectors.toList());
+						logger.error("DataProcess_Hotel_gt10_base_price批量导入失败的数据为：" + collect);
+					}
+					logger.info("DataProcess_Hotel_gt10_base_price批量导入的数据总条数为：" + bulkNum * loopNum + ",状态为："
+							+ response.status());
+				}
 			}
-			if (parseObject.get("updateTime") != null) {
-				parseObject.put("updateTime",
-						DateUtils.longToString((long) parseObject.get("updateTime"), "yyyy-MM-dd HH:mm:ss.SSS"));
-			}
-			IndexResponse response = client.prepareIndex("base_price", "base_price")
-					.setSource(parseObject.toJSONString(), XContentType.JSON).get();
-			logger.info("DataProcess_Hotel_gt10_price_adapter========" + response.status());
-		});
+		}
+		// 批量导入后剩余的数据
+		BulkResponse response = requestBuilder.get();
+		if (response.hasFailures()) {
+			// 数据导入失败时，打印这个批次全部的数据
+			List<String> collect = datas.subList(bulkNum * loopNum, datas.size()).stream().map(e -> e.getBody())
+					.collect(Collectors.toList());
+			logger.error("DataProcess_Hotel_gt10_base_price批量导入后剩余的数据导入失败的数据为：" + collect);
+		}
+		logger.info("DataProcess_Hotel_gt10_base_price批量导入后剩余的数据导入的总条数为：" + (count - bulkNum * loopNum) + ",状态为："
+				+ response.status());
 		return false;
 	}
 }

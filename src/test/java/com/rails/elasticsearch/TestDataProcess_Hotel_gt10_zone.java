@@ -26,9 +26,15 @@ public class TestDataProcess_Hotel_gt10_zone {
 		String body = "{\r\n" + "  \"zoneCode\": \"11\",\r\n" + "  \"zoneName\": \"同安区\",\r\n"
 				+ "   \"priority\": \"0\",\r\n" + "   \"validFlag\": \"1\",\r\n" + "   \"cityCode\": \"25\",\r\n"
 				+ " \"cityName\": \"厦门\",\r\n" + "   \"hotFlag\": \"0\",\r\n" + "   \"vaildFlag\": \"\"\r\n" + " }";
+		String body2 = "{\r\n" + "  \"zoneCode\": \"12\",\r\n" + "  \"zoneName\": \"同安区\",\r\n"
+				+ "   \"priority\": \"0\",\r\n" + "   \"validFlag\": \"1\",\r\n" + "   \"cityCode\": \"25\",\r\n"
+				+ " \"cityName\": \"厦门\",\r\n" + "   \"hotFlag\": \"0\",\r\n" + "   \"vaildFlag\": \"\"\r\n" + " }";
 		MessageRequest messageRequest = new MessageRequest();
 		messageRequest.setBody(body);
 		datas.add(messageRequest);
+		MessageRequest messageRequest2 = new MessageRequest();
+		messageRequest2.setBody(body2);
+		datas.add(messageRequest2);
 		boolean mqData2Elasticsearch = dataProcess_Hotel_gt10_zone.mqData2Elasticsearch(datas);
 		Assert.assertTrue(!mqData2Elasticsearch);
 	}

@@ -27,9 +27,23 @@ public class TestDataProcess_Hotel_gt10_business_area {
 				+ "	\"shortName\": \"虹桥\",\r\n" + "	\"priority\": \"0\",\r\n" + "	\"validFlag\": \"1\",\r\n"
 				+ "	\"cityCode\": 2,\r\n" + "	\"cityName\": \"\",\r\n" + "	\"hotFlag\": \"0\",\r\n"
 				+ "	\"lng\": 121.401031494141,\r\n" + "	\"lat\": 31.2018852233887\r\n" + "}";
+		String body2 = "{\r\n" + "	\"businessCode\": 5,\r\n" + "	\"businessName\": \"虹桥地区\",\r\n"
+				+ "	\"shortName\": \"虹桥\",\r\n" + "	\"priority\": \"0\",\r\n" + "	\"validFlag\": \"1\",\r\n"
+				+ "	\"cityCode\": 2,\r\n" + "	\"cityName\": \"\",\r\n" + "	\"hotFlag\": \"0\",\r\n"
+				+ "	\"lng\": 121.401031494141,\r\n" + "	\"lat\": 31.2018852233887\r\n" + "}";
+		String body3 = "{\r\n" + "	\"businessCode\": 6,\r\n" + "	\"businessName\": \"虹桥地区\",\r\n"
+				+ "	\"shortName\": \"虹桥\",\r\n" + "	\"priority\": \"0\",\r\n" + "	\"validFlag\": \"1\",\r\n"
+				+ "	\"cityCode\": 2,\r\n" + "	\"cityName\": \"\",\r\n" + "	\"hotFlag\": \"0\",\r\n"
+				+ "	\"lng\": 121.401031494141,\r\n" + "	\"lat\": 31.2018852233887\r\n" + "}";
 		MessageRequest messageRequest = new MessageRequest();
+		MessageRequest messageRequest2 = new MessageRequest();
+		MessageRequest messageRequest3 = new MessageRequest();
 		messageRequest.setBody(body);
+		messageRequest2.setBody(body2);
+		messageRequest3.setBody(body3);
 		datas.add(messageRequest);
+		datas.add(messageRequest2);
+		datas.add(messageRequest3);
 		boolean mqData2Elasticsearch = dataProcess_Hotel_gt10_business_area.mqData2Elasticsearch(datas);
 		Assert.assertTrue(!mqData2Elasticsearch);
 	}

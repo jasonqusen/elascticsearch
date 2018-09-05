@@ -29,9 +29,18 @@ public class TestDataProcess_Hotel_gt10_city {
 				+ "	\"countryCode\": \"1\",\r\n" + "	\"countryName\": \"中国\",\r\n" + "	\"hotFlag\": \"0\",\r\n"
 				+ "	\"parentCityCode\": \"-1\",\r\n" + "	\"lng\": \"116.407399\",\r\n"
 				+ "	\"lat\": \"39.904211\"\r\n" + "}";
+		String body2 = "{\r\n" + "	\"cityCode\": \"2\",\r\n" + "	\"cityName\": \"北京\",\r\n"
+				+ "	\"cityNameEn\": \"Beijing\",\r\n" + "	\"priority\": \"0\",\r\n" + "	\"validFlag\": \"1\",\r\n"
+				+ "	\"suoXie\": \"\",\r\n" + "	\"provinceCode\": \"1\",\r\n" + "	\"provinceName\": \"北京\",\r\n"
+				+ "	\"countryCode\": \"1\",\r\n" + "	\"countryName\": \"中国\",\r\n" + "	\"hotFlag\": \"0\",\r\n"
+				+ "	\"parentCityCode\": \"-1\",\r\n" + "	\"lng\": \"116.407399\",\r\n"
+				+ "	\"lat\": \"39.904211\"\r\n" + "}";
 		MessageRequest messageRequest = new MessageRequest();
+		MessageRequest messageRequest2 = new MessageRequest();
 		messageRequest.setBody(body);
+		messageRequest2.setBody(body2);
 		datas.add(messageRequest);
+		datas.add(messageRequest2);
 		boolean mqData2Elasticsearch = dataProcess_Hotel_gt10_city.mqData2Elasticsearch(datas);
 		Assert.assertTrue(!mqData2Elasticsearch);
 	}

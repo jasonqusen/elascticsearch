@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.GeoPointField;
 
 import lombok.Data;
 
@@ -33,5 +34,7 @@ public class Business_area {
 	private Double lat;
 	@Field(type = FieldType.Keyword)
 	private String vaildFlag;
+	@GeoPointField
+	private String location;
 
 }

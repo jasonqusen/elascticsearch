@@ -6,8 +6,11 @@
 package com.rails.elasticsearch.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.index.IndexRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
@@ -21,20 +24,55 @@ import com.rails.elasticsearch.service.MQ2Elasticsearch;
 
 @Service("dataProcess_Hotel_gt10_province")
 public class DataProcess_Hotel_gt10_province implements MQ2Elasticsearch {
+	private static final int bulkNum = 2;
 	private Logger logger = LoggerFactory.getLogger(DataProcess_Hotel_gt10_province.class);
 	@Autowired
 	private TransportClient client;
 
 	@Override
 	public boolean mqData2Elasticsearch(List<MessageRequest> datas) {
-		datas.stream().forEach(e -> {
-			String body = e.getBody();
-			JSONObject parseObject = JSONObject.parseObject(body);
+		int count = 0;
+		int loopNum = 0;// 批量导入数据循环次数
+		logger.info("DataProcess_Hotel_gt10_province需要导入的数据总条数为：" + datas.size() + "条,以" + bulkNum + "条为一个批次进行导入。");
+		BulkRequestBuilder bulkRequest = client.prepareBulk();
+		BulkRequestBuilder requestBuilder = null;
+		for (int i = 0; i < datas.size(); i++) {
+			JSONObject parseObject = JSONObject.parseObject(datas.get(i).getBody());
+			if (parseObject != null) {
 
-			IndexResponse response = client.prepareIndex("province", "province", parseObject.getString("provinceCode"))
-					.setSource(parseObject.toJSONString(), XContentType.JSON).get();
-			logger.info("DataProcess_Hotel_gt10_province========" + response.status());
-		});
+				IndexRequestBuilder setSource = client
+						.prepareIndex("province", "province", parseObject.getString("provinceCode"))
+						.setRouting(parseObject.getString("provinceCode"))
+						.setSource(parseObject.toJSONString(), XContentType.JSON);
+
+				requestBuilder = bulkRequest.add(setSource);
+				count++;
+				// 每100条数据进行批量导入
+				if (count % bulkNum == 0) {
+					loopNum++;
+					BulkResponse response = requestBuilder.get();
+					bulkRequest = client.prepareBulk();
+					if (response.hasFailures()) {
+						// 数据导入失败时，打印这个批次全部的数据
+						List<String> collect = datas.subList(bulkNum * (loopNum - 1), bulkNum * loopNum).stream()
+								.map(e -> e.getBody()).collect(Collectors.toList());
+						logger.error("DataProcess_Hotel_gt10_province批量导入失败的数据为：" + collect);
+					}
+					logger.info("DataProcess_Hotel_gt10_province批量导入的数据总条数为：" + bulkNum * loopNum + ",状态为："
+							+ response.status());
+				}
+			}
+		}
+		// 批量导入后剩余的数据
+		BulkResponse response = requestBuilder.get();
+		if (response.hasFailures()) {
+			// 数据导入失败时，打印这个批次全部的数据
+			List<String> collect = datas.subList(bulkNum * loopNum, datas.size()).stream().map(e -> e.getBody())
+					.collect(Collectors.toList());
+			logger.error("DataProcess_Hotel_gt10_province批量导入后剩余的数据导入失败的数据为：" + collect);
+		}
+		logger.info("DataProcess_Hotel_gt10_province批量导入后剩余的数据导入的总条数为：" + (count - bulkNum * loopNum) + ",状态为："
+				+ response.status());
 		return false;
 	}
 }
